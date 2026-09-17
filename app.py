@@ -54,13 +54,13 @@ def send_email():
         })
 
     except Exception as e:
-        print("发送邮件错误：")
-        traceback.print_exc()
+    print("发送邮件错误：")
+    traceback.print_exc()
 
-        return jsonify({
-            "success": False,
-            "message": str(e)
-        }), 500
+    return jsonify({
+        "success": False,
+        "message": str(e)
+    }), 500
 
 
 if __name__ == "__main__":
