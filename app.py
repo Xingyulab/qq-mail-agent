@@ -2,15 +2,19 @@ from flask import Flask, request, jsonify
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+import os
+import traceback
 
 app = Flask(__name__)
 
-QQ_EMAIL = "1789030957@qq.com"
-QQ_AUTH_CODE = "ifapiuygmlpcfbgf"
+QQ_EMAIL = os.environ.get("QQ_EMAIL")
+QQ_AUTH_CODE = os.environ.get("QQ_AUTH_CODE")
+
 
 @app.route("/")
 def home():
     return "QQ Mail Agent API 运行成功！"
+
 
 @app.route("/send-email", methods=["POST"])
 def send_email():
@@ -26,6 +30,12 @@ def send_email():
                 "success": False,
                 "message": "缺少 to、subject 或 content"
             }), 400
+
+        if not QQ_EMAIL or not QQ_AUTH_CODE:
+            return jsonify({
+                "success": False,
+                "message": "QQ邮箱环境变量没有读取到"
+            }), 500
 
         message = MIMEText(content, "plain", "utf-8")
         message["From"] = QQ_EMAIL
@@ -44,6 +54,9 @@ def send_email():
         })
 
     except Exception as e:
+        print("发送邮件错误：")
+        traceback.print_exc()
+
         return jsonify({
             "success": False,
             "message": str(e)
