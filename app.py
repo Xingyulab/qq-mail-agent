@@ -53,11 +53,19 @@ def send_email():
         })
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": type(e).__name__,
-            "message": str(e)
-        }), 500
+    import traceback
+
+    print("========== EMAIL ERROR ==========")
+    print(type(e).__name__)
+    print(str(e))
+    traceback.print_exc()
+    print("=================================")
+
+    return jsonify({
+        "success": False,
+        "error": type(e).__name__,
+        "message": str(e)
+    }), 500
 
 
 if __name__ == "__main__":
