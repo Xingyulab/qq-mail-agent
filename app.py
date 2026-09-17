@@ -3,7 +3,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 import os
-import traceback
 
 app = Flask(__name__)
 
@@ -54,13 +53,11 @@ def send_email():
         })
 
     except Exception as e:
-    print("发送邮件错误：")
-    traceback.print_exc()
-
-    return jsonify({
-        "success": False,
-        "message": str(e)
-    }), 500
+        return jsonify({
+            "success": False,
+            "error": type(e).__name__,
+            "message": str(e)
+        }), 500
 
 
 if __name__ == "__main__":
