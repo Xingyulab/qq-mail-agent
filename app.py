@@ -21,6 +21,12 @@ def send_email():
     try:
         data = request.get_json()
 
+        if not data:
+            return jsonify({
+                "success": False,
+                "message": "没有收到JSON数据"
+            }), 400
+
         to_email = data.get("to")
         subject = data.get("subject")
         content = data.get("content")
@@ -42,9 +48,28 @@ def send_email():
         message["To"] = to_email
         message["Subject"] = Header(subject, "utf-8")
 
-        server = smtplib.SMTP_SSL("smtp.qq.com", 465)
-        server.login(QQ_EMAIL, QQ_AUTH_CODE)
-        server.sendmail(QQ_EMAIL, [to_email], message.as_string())
+        # QQ邮箱 SMTP：587端口 + STARTTLS
+        server = smtplib.SMTP(
+            "smtp.qq.com",
+            587,
+            timeout=20
+        )
+
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+
+        server.login(
+            QQ_EMAIL,
+            QQ_AUTH_CODE
+        )
+
+        server.sendmail(
+            QQ_EMAIL,
+            [to_email],
+            message.as_string()
+        )
+
         server.quit()
 
         return jsonify({
@@ -55,8 +80,8 @@ def send_email():
 
     except Exception as e:
         print("========== EMAIL ERROR ==========")
-        print(type(e).__name__)
-        print(str(e))
+        print("错误类型:", type(e).__name__)
+        print("错误信息:", str(e))
         traceback.print_exc()
         print("=================================")
 
@@ -68,4 +93,7 @@ def send_email():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(
+        host="0.0.0.0",
+        port=5000
+    )
